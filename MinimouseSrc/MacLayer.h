@@ -18,7 +18,6 @@ Maintainer        : Fabien Holin ( SEMTECH)
 #include "mbed.h"
 #include  "Define.h"
 #include "PhyLayer.h"
-#include "sx1276-hal.h"
 #include "LoraMacDataStoreInFlash.h"
 #ifndef MAC_LAYER_H
 #define MAC_LAYER_H

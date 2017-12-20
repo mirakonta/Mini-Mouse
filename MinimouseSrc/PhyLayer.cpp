@@ -16,19 +16,15 @@ License           : Revised BSD License, see LICENSE.TXT file include in the pro
 Maintainer        : Fabien Holin (SEMTECH)
 */
 #include "PhyLayer.h"
-#include "sx1276-hal.h"
-#include "sx1276Regs-LoRa.h"
 #include "MacLayer.h"
 #include "LoraWanProcess.h"
 #include "ApiRtc.h"
 #include "Define.h"
-
-static RadioEvents_t RadioEvents;
-
+#include "radio.h"
 
 
 RadioContainer::RadioContainer( PinName interrupt )
-                :Radio( NULL ), TxInterrupt( interrupt ), RxTimeoutInterrupt ( RX_TIMEOUT_IT ) {
+                :Radio( ), TxInterrupt( interrupt ), RxTimeoutInterrupt ( RX_TIMEOUT_IT ) {
     StateRadioProcess = RADIOSTATE_IDLE;
     TxInterrupt.rise( this,&RadioContainer::IsrRadio );
     RxTimeoutInterrupt.rise( this,&RadioContainer::IsrRadio );
@@ -87,17 +83,17 @@ void RadioContainer::IsrRadio( void ) {
  
 void RadioContainer::SetTxConfig( void ) {
     StateRadioProcess = RADIOSTATE_TXON;
-    Radio.SetChannel( TxFrequency );
-    Radio.Write( REG_LR_SYNCWORD, LORA_MAC_SYNCWORD );
-    Radio.SetTxConfig( MODEM_LORA, TxPower, 0, BW125, TxSf, 1, 8, false, true, 0, 0, false, 10e3 );
+    // Radio.SetChannel( TxFrequency );
+    // Radio.Write( REG_LR_SYNCWORD, LORA_MAC_SYNCWORD );
+    // Radio.SetTxConfig( MODEM_LORA, TxPower, 0, BW125, TxSf, 1, 8, false, true, 0, 0, false, 10e3 );
 };
 void RadioContainer::Send( ) { //@note could/should be merge with tx config
-    Radio.Send( TxPhyPayload, TxPayloadSize );
+    Radio.SendLora( TxPhyPayload, TxPayloadSize, RxSf, Radio::BW_125, TxFrequency, TxPower );
 };
 
 void RadioContainer::SetRxConfig( void ) {
-    Radio.SetChannel( RxFrequency );
-    Radio.SetRxConfig( MODEM_LORA, BW125, RxSf, 1, 0, 6, 10, false, 0, false, 0, 0, true, false );//@note rxtimeout 400ms!!!!
+    // Radio.SetChannel( RxFrequency );
+    // Radio.SetRxConfig( MODEM_LORA, BW125, RxSf, 1, 0, 6, 10, false, 0, false, 0, 0, true, false );//@note rxtimeout 400ms!!!!
 }
 
 int RadioContainer::GetRadioState( void ) {
@@ -105,7 +101,7 @@ int RadioContainer::GetRadioState( void ) {
 };
 
 void RadioContainer::RadioContainerInit( void ) {
-    Radio.Write( REG_LR_SYNCWORD, LORA_MAC_SYNCWORD );
+    Radio.Init( LORA_MAC_SYNCWORD );
     Radio.Sleep( );
 }
 
@@ -116,11 +112,11 @@ void RadioContainer::RadioContainerInit( void ) {
 
 
 int RadioContainer::DumpRxPayloadAndMetadata ( void ) {
-
+/* TODO
     RxPhyPayloadSize = Radio.Read( REG_LR_RXNBBYTES );
     Radio.ReadFifo( RxPhyPayload, RxPhyPayloadSize );
     RxPhyPayloadSnr = Radio.Read( REG_LR_PKTSNRVALUE );
-    RxPhyPayloadRssi = Radio.Read( REG_LR_PKTRSSIVALUE );
+    RxPhyPayloadRssi = Radio.Read( REG_LR_PKTRSSIVALUE );*/
    /* check Mtype */
     int status = OKLORAWAN;
     uint8_t MtypeRxtmp = RxPhyPayload[0] >> 5 ;
@@ -136,8 +132,8 @@ int RadioContainer::DumpRxPayloadAndMetadata ( void ) {
     return (status);
 }
 void  RadioContainer::ClearIrqRadioFlag ( void ) {
-    Radio.Write( REG_LR_IRQFLAGS, 0 );
+    //TODO Radio.Write( REG_LR_IRQFLAGS, 0 );
 }
 void  RadioContainer::GetIrqRadioFlag ( void ) {
-    RegIrqFlag = Radio.Read ( REG_LR_IRQFLAGS );
+    //TODO RegIrqFlag = Radio.Read ( REG_LR_IRQFLAGS );
 }

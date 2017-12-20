@@ -584,7 +584,8 @@ void LoraWanContainer::SetAlarm (uint32_t alarmInMs) {
 
 void LoraWanContainer::IsrTimerRx( void ) {
      StateTimer = TIMERSTATE_SLEEP;
-     Phy.Radio.Rx(0); //@note No More timeout FW on RX use only timeout impplement in the HW radio
+     // TODO
+    // Phy.Radio.Rx(0); //@note No More timeout FW on RX use only timeout impplement in the HW radio
 };
  
 

@@ -15,22 +15,16 @@ License           : Revised BSD License, see LICENSE.TXT file include in the pro
 
 Maintainer        : Fabien Holin (SEMTECH)
 */
-#include "sx1276-hal.h"
 #include "Define.h"
 #ifndef PHY_LAYER_H
 #define PHY_LAYER_H
+#include "SX126x.h"
 
-/*   BW enum for LoRa */
-enum { 
-    BW125,
-    BW250,
-    BW500
-};    
 class RadioContainer { 
 public: 
     RadioContainer( PinName interrupt ); 
     ~RadioContainer( );
-    SX1276MB1xAS Radio;
+    SX126x Radio;
     void RadioContainerInit( void );
     void Send( void );
     void Receive (void );
